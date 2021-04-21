@@ -1,5 +1,8 @@
 Assignment:
-Given a string representing a document, write a function or class which returns the top 10 most frequent repeated phrases. A phrase is a stretch of three to ten consecutive words and cannot span sentences. Omit a phrase if it is a subset of another, longer phrase, even if the shorter phrase occurs more frequently (for example, if “cool and collected” and “calm cool and collected” are repeated, do not include “cool and collected” in the returned set). A phrase is repeated if it is used two or more times.
+Given a string representing a document, write a function or class which returns the top 10 most frequent repeated phrases.
+A phrase is a stretch of three to ten consecutive words and cannot span sentences.
+Omit a phrase if it is a subset of another, longer phrase, even if the shorter phrase occurs more frequently (for example, if “cool and collected” and “calm cool and collected” are repeated, do not include “cool and collected” in the returned set).
+A phrase is repeated if it is used two or more times.
 
 
 Sample input & output:
