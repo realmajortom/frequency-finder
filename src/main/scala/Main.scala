@@ -2,27 +2,34 @@ import scala.collection.mutable.Map
 
 object Main extends App {
   def frequencyFinder(text: String): List[String] = {
-    // Split input text by sentence b/c phrases can't span sentences. Then split each sentence into a list of words
+    // Splits input text by sentence b/c phrases can't span sentences. Then splits each sentence into a list of words.
     val sentences: List[List[String]] = text.toLowerCase.split(Array('.', '!', '?')).toList.map(_.split(" ").toList)
 
-    // Iterate through each sentence, split each into chunks ranging between 3 & 10 words (or the sentence length if it's below 10)
+    // Iterates through each sentence, generating every possible chunk ranging between 3 & 10 words
     val phrases: List[String] = sentences.flatMap { words =>
       val max = if (words.size >= 10) 10 else words.size
       (for (i <- 3 to max) yield {
-        // Slides over words, then transforms each subset of words into a string, and removes trailing punctuation/newlines/leading spaces
+        // Slides over words, then transforms each subset of words into a single string and removes trailing punctuation/newlines/leading spaces
         words.sliding(i).toList.map(_.mkString(" ").replaceAll("^[ \\t]+|\n|[,;:]$", ""))
       }).flatten
     }
 
-    // Count the occurrences of each phrase
+    // Counts the occurrences of each phrase and removes phrases occurring less than twice
     val phraseCounts: Map[String, Int] = phrases.foldLeft(Map[String, Int]()) { (map, phrase) =>
       val count = map.get(phrase).getOrElse(0)
       map.addOne(phrase, count + 1)
     }.filterInPlace((_, count) => count > 1)
 
-    // Filter out phrases that are a substring of a larger phrase
+    // Filter out phrases that are a part of a larger frequently-occurring phrase
     phraseCounts.keys.filterNot { phrase =>
-      phraseCounts.keys.exists(p => p != phrase && p.contains(phrase))
+      /*
+        According to spec we want to remove sub-phrases, not substrings ... so we cant just do `largerPhrase.contains(smallerPhrase)`
+        because while "the lazy dog" is a substring of "the lazy dogZ", it's not a sub-phrase; therefore we want to keep it as a frequently occurring phrase.
+
+        My super hacky workaround is to append whitespace at the beginning and end of the sub-phrase and parent-phrase,
+        then perform substring match. " the lazy dog " is NOT a substring of " the lazy dogZ " so it will remain as expected
+       */
+      phraseCounts.keys.exists(p => p != phrase && s" $p ".contains(s" $phrase "))
     }.map(p => p -> phraseCounts.get(p).getOrElse(0)).toSeq.sortWith(_._2 < _._2).map(_._1).toList
   }
 
